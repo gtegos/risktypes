@@ -8,7 +8,8 @@ from datetime import datetime
 
 
 class AppJSONEncoder(JSONEncoder):
-
+    ''' Specialized JSONEncoder to handle Pyhton datetime objects
+    '''
     def default(self, obj):
         try:
             if isinstance(obj, datetime):
@@ -39,7 +40,9 @@ db.init_app(server)
 
 from rest import *
 
+
 '''
+# create the database
 with server.app_context():
     # Extensions like Flask-SQLAlchemy now know what the "current" app
     # is while within this block. Therefore, you can now run........
