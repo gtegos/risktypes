@@ -16,6 +16,9 @@ class RiskTypeDefinition(db.Model):
     # name of risk type
     name = db.Column(db.String, nullable=False)
 
+    # description of risk type
+    description = db.Column(db.String, nullable=False)
+
     fields = db.relationship('RiskTypeField')
 
     @property
@@ -23,7 +26,8 @@ class RiskTypeDefinition(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'fields': [x.serialize for x in self.fields]
+            'description': self.description,
+            'fields': [x.serialize for x in sorted(self.fields, key=lambda x: x.id)]
         }
 
 
@@ -38,11 +42,17 @@ class RiskTypeField(db.Model):
     # Field name
     name = db.Column(db.String, nullable=False)
 
+    # Field hint
+    hint = db.Column(db.String)
+
     # Field data type (text, number, date, enum)
     datatype = db.Column(db.String, nullable=False)
 
     # comma delimited list of options for enumerable fields
     options = db.Column(db.String, nullable=True)
+
+    # required flag
+    required = db.Column(db.Boolean)
 
     type = db.relationship("RiskTypeDefinition", uselist=False)
 
@@ -55,6 +65,8 @@ class RiskTypeField(db.Model):
             'id': self.id,
             'type_id': self.type_id,
             'name': self.name,
+            'hint': self.hint,
+            'required': self.required is True,
             'datatype': self.datatype,
             'options': options
         }
