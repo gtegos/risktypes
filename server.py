@@ -1,13 +1,13 @@
 import inspect, os
 from flask import Flask
 from flask.json import JSONEncoder
-from flask_compress import Compress
 from flask_cors import CORS
+from models import db
 
 from datetime import datetime
 
 
-class ClustersJSONEncoder(JSONEncoder):
+class AppJSONEncoder(JSONEncoder):
 
     def default(self, obj):
         try:
@@ -25,14 +25,23 @@ server = Flask(__name__)
 server.config['JSON_AS_ASCII'] = False
 server.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
+server.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:nbt9832@localhost:5432/britecore'
 server.config['APP_DB_NAME'] = 'postgresql'
 server.config['APP_VERSION'] = '1.0.0.0'
 
-server.json_encoder = ClustersJSONEncoder
+server.json_encoder = AppJSONEncoder
 
-Compress(server)
 CORS(server)
 
 rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-from controllers.risktypes import *
+db.init_app(server)
+
+from rest import *
+
+'''
+with server.app_context():
+    # Extensions like Flask-SQLAlchemy now know what the "current" app
+    # is while within this block. Therefore, you can now run........
+    db.create_all()
+'''

@@ -3,7 +3,7 @@ from os import environ
 
 
 def flaskrun(app, default_host="127.0.0.1",
-                  default_port="5000"):
+                  default_port="5050"):
     """
     Takes a flask.Flask instance and runs it. Parses
     command-line flags to configure the app.
