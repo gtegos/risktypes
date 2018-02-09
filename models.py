@@ -9,6 +9,8 @@ db = SQLAlchemy()
 
 
 class RiskTypeDefinition(db.Model):
+    ''' Definition of a risk type
+    '''
     __tablename__ = 'types'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +23,7 @@ class RiskTypeDefinition(db.Model):
 
     fields = db.relationship('RiskTypeField')
 
+    # JSON serialization helper
     @property
     def serialize(self):
         return {
@@ -32,12 +35,15 @@ class RiskTypeDefinition(db.Model):
 
 
 class RiskTypeField(db.Model):
+    ''' Definition of a risk type field
+    '''
     __tablename__ = 'fields'
 
     id = db.Column(db.Integer, primary_key=True)
 
     # Risk type definition id to which this field definition belongs
     type_id = db.Column(db.Integer, db.ForeignKey('types.id'))
+    type = db.relationship("RiskTypeDefinition", uselist=False)
 
     # Field name
     name = db.Column(db.String, nullable=False)
@@ -54,8 +60,7 @@ class RiskTypeField(db.Model):
     # required flag
     required = db.Column(db.Boolean)
 
-    type = db.relationship("RiskTypeDefinition", uselist=False)
-
+    # JSON serialization helper
     @property
     def serialize(self):
         options = []
@@ -73,36 +78,49 @@ class RiskTypeField(db.Model):
 
 
 class RiskTypeInstance(db.Model):
+    ''' instance of a risk type
+    '''
     __tablename__ = 'instances'
 
     id = db.Column(db.Integer, primary_key=True)
-    type_id = db.Column(db.Integer, db.ForeignKey('types.id'))
 
+    # risk type definition reference
+    type_id = db.Column(db.Integer, db.ForeignKey('types.id'))
     type = db.relationship("RiskTypeDefinition", uselist=False)
+
+    date = db.Column(db.Date, nullable=False)
 
 
 class RiskTypeFieldInstance(db.Model):
+    ''' instance of a risk type field
+    '''
     __tablename__ = 'fieldinstances'
 
     id = db.Column(db.Integer, primary_key=True)
 
+    # risk type instance associated with the field instance
     instance_id = db.Column(db.Integer, db.ForeignKey('instances.id'))
     instance = db.relationship("RiskTypeInstance", uselist=False)
 
-    datatype = db.Column(db.String, nullable=False)
+    # field definition associated with the field instance
+    field_definition_id = db.Column(db.Integer, db.ForeignKey('fields.id'))
+    field_definition = db.relationship("RiskTypeField", uselist=False)
+
+    # internal text representation of the field value
     text = db.Column(db.String, nullable=False)
 
     @property
     def value(self):
         ''' get typed value from internal representation
         '''
-        if self.type == 'text':
+        datatype = self.field_definition.datatype
+        if datatype == 'text':
             return self.text
-        elif self.type == 'number':
+        elif datatype == 'number':
             return float(self.text)
-        elif self.type == 'enum':
+        elif datatype == 'enum':
             return self.text
-        elif self.type == 'date':
+        elif datatype == 'date':
             return dateutil.parser.parse(self.text)
         return None
 

@@ -27,17 +27,16 @@ server.config['JSON_AS_ASCII'] = False
 server.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 server.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:nbt9832@localhost:5432/britecore'
-server.config['APP_DB_NAME'] = 'postgresql'
-server.config['APP_VERSION'] = '1.0.0.0'
+# server.config['APP_DB_NAME'] = 'postgresql'
+# server.config['APP_VERSION'] = '1.0.0.0'
 
 server.json_encoder = AppJSONEncoder
 
 CORS(server)
 
-rootPath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
 db.init_app(server)
 
+# import the REST API
 from rest import *
 
 

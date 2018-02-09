@@ -1,0 +1,8 @@
+{
+    "dev": {
+        "s3_bucket": "risktypes",
+        "project_name": "FlaskRiskTypes",
+        "settings_file": "zappa_settings.py",
+        "exclude": ["*.git*", "./static/*", "*.zip"]
+    }
+}
